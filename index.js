@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config()
-
+const gqlHeader = require('express-graphql-header')
+const adminGql = require('./src/gql/Admin/graphql')
 
 //env file
 const url = process.env.SERVER_URL || 8080
@@ -33,7 +34,7 @@ app.get ("/", (req, res) => {
 //all rest api
 
 //all graphql api
-
+app.use ("/admin", gqlHeader, adminGql)
 
 //page not found route
 app.get ("*", (req, res) => {
