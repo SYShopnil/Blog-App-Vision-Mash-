@@ -12,14 +12,31 @@ const Admin = `
         personalInfo: PersonalInfo
         userId : String
         password: String
-        isDelete: String
+        isDelete: Boolean
+    }
+`
+const inputField = `
+    input inputDataOfAdmin {
+        firstName: String!
+        lastName: String!
+        email: String!
+        password: String!
+        retypePassword: String!
     }
 `
 const mainSchema = buildSchema (`
     ${Admin}
+    ${inputField}
+    type responseOfCreateAdmin {
+        message: String
+        data: Admin
+        status: Int
+    }
     type Query {
-        admins : [Admin]
-        admin (slug: String): Admin
+        admin: responseOfCreateAdmin
+    }
+    type Mutation  {
+        createAdmin (input: inputDataOfAdmin) : responseOfCreateAdmin
     }
 `)
 

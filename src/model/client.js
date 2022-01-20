@@ -23,6 +23,10 @@ const clientSchema = new Schema ({
         }
     },
     password: String,
+    userType: {
+        type: String,
+        default: "client"
+    },
     clientId: String,
     slug: String,
     otp: {
@@ -54,4 +58,4 @@ const clientSchema = new Schema ({
     }
 })
 
-module.exports = mongoose.model ("Contact", clientSchema)
+module.exports = mongoose.model ("Client", clientSchema)

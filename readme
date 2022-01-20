@@ -1,2 +1,3 @@
 SERVER_URL = any port name
 MONGO_URL = mongodb Url
+SERVER_URL = server base domain url 

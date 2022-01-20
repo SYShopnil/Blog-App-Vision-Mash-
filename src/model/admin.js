@@ -8,6 +8,11 @@ const adminSchema = new Schema ({
         lastName: String,
         email: String
     },
+    userType: {
+        type: String,
+        enum : ["admin"],
+        default: "admin"
+    },
     userId: String,
     password: String,
     isDelete: {

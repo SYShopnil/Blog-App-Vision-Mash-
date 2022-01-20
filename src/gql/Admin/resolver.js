@@ -1,23 +1,7 @@
+const {createNewAdmin} = require('./controller')
+
 const resolver = {
-    admins: () => {
-        return [{
-                slug: "Hello",
-                userId: "123"
-            },
-            {
-                slug: "Hello",
-                userId: "123"
-            },
-            {
-                slug: "Hello",
-                userId: "123"
-            },
-            {
-                slug: "Hello",
-                userId: "123"
-            }
-        ]
-    }
+    createAdmin: createNewAdmin
 }
 
 module.exports = resolver
