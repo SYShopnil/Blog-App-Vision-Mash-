@@ -7,6 +7,9 @@ const blogSchema = new Schema ({
         type: Boolean,
         default: false
     },
+    publishedTime: {
+        type: Date
+    },
     isFeatured: {
         type: Boolean,
         default: false
@@ -59,6 +62,9 @@ const blogSchema = new Schema ({
             }
         ]
     }
+},
+{
+    timestamps: true
 })
 
 module.exports = mongoose.model ("Blog", blogSchema)

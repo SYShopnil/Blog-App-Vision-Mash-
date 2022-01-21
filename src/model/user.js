@@ -11,5 +11,8 @@ const userSchema = new Schema ({
         type: String,
         enum: ["admin", "client"]
     }
+},
+{
+    timestamps: true
 })
 module.exports = mongoose.model ("User", userSchema)

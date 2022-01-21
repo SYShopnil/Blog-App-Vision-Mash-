@@ -35,6 +35,9 @@ const officialSchema = new Schema ({
         phone: String,
         address: String
     }
+},
+{
+    timestamps: true
 })
 
 module.exports = mongoose.model ("Official", officialSchema)

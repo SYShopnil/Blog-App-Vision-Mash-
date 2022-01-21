@@ -1,6 +1,9 @@
-const { createNewClientController} = require('./controller')
+const { createNewClientController
+    ,deleteClientBySlugController} = require('./controller')
+
 const resolver = {
-    createClient : createNewClientController
+    createClient : createNewClientController,
+    deleteClient: deleteClientBySlugController
 }
 
 module.exports = resolver

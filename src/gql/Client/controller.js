@@ -10,8 +10,9 @@ const {profilePicUploader,
 const bcrypt = require('bcrypt')
 const slugGenerator = require('../../../utils/slugGenerator')
 const newUser = require('../../../utils/controller/createUser')
+const authorizationGql = require('../../../utils/autorization')
 
-
+//create a new client
 const createNewClientController = async ({input}, req) => {
     try {
         const {
@@ -110,9 +111,9 @@ const createNewClientController = async ({input}, req) => {
                                     const {saveUser} = await newUser ("client", clientId, email) //creat a new user
                                     if (saveUser) { //if the user is successfully save then it will execute
                                         return {
-                                            message: "Client has been successfully saved",
+                                            message: "Client successfully created",
                                             data: saveClient,
-                                            status: 406
+                                            status: 201
                                         }
                                     }else {
                                         return {
@@ -122,20 +123,21 @@ const createNewClientController = async ({input}, req) => {
                                     }
                                 }else {
                                     return {
-                                        message: "Client Createion Failed",
+                                        message: "Client Creation Failed",
                                         status: 406
                                     }
                                 }
                             }else {
                                 return {
-                                    message: "Password Hasing Problem",
+                                    message: "Password Hashing Problem",
                                     status: 406
                                 }
                             }
                             
                         }else {
                             return {
-                                message: `Only ${acceptedExtensionsPic.reduce ((initial, reducer) => {return `${initial + " " + reducer}`}, "")} are allowed`
+                                message: `Only ${acceptedExtensionsPic.reduce ((initial, reducer) => {return `${initial + " " + reducer}`}, "")} are allowed`,
+                                status: 406
                             }
                         }
                     }else {
@@ -169,6 +171,58 @@ const createNewClientController = async ({input}, req) => {
     }
 }
 
-module.exports = {
-    createNewClientController
+//delete a single client by slug
+const deleteClientBySlugController = async ({slug}, req) => {
+    try {
+        const {isAuth, user} = req //check tht is it authenticate user or not 
+        if (isAuth) {
+            const {isAuthorized} = await  authorizationGql (user, "admin", "client")
+            if (isAuthorized) {
+                const deleteClient = await Client.updateOne ( //delete client temporary by edit the is delete field of client
+                    {
+                        slug
+                    }, //query 
+                    {
+                        $set : {
+                            "othersInfo.isDelete": true
+                        }
+                    }, //update
+                    {multi: true} //option
+                )
+                if (deleteClient.modifiedCount != 0 ) {
+                    return {
+                        message: "Client has been successfully deleted",
+                        status: 202
+                    }
+                }else {
+                    return {
+                        message: "Client delete failed",
+                        status: 304
+                    }
+                }
+            }else {
+                return {
+                    message:  "Permission denied",
+                    status: 401
+                }
+            }
+        }else { 
+            return {
+                message: "Unauthorized user",
+                status: 401
+            }
+        }
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
 }
+
+module.exports = {
+    createNewClientController,
+    deleteClientBySlugController
+}
+

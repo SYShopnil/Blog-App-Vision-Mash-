@@ -9,6 +9,9 @@ const contactSchema = new Schema ({
         default: false
     },
     message: String
+},
+{
+    timestamps: true
 })
 
 module.exports = mongoose.model ("Contact", contactSchema)

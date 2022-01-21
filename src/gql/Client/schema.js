@@ -117,12 +117,19 @@ const mainSchema = buildSchema (`
         data: Client
         status: Int
     }
+    type ResponseOfDeleteAdmin {
+        message: String
+        status: Int
+    }
     type Query {
         createClient : ResponseOfCreateAdmin
     }
     type Mutation {
         createClient (input: createClientInput) : ResponseOfCreateAdmin
+        deleteClient (slug: String!) : ResponseOfDeleteAdmin
     }
 `)
 
 module.exports = mainSchema
+
+

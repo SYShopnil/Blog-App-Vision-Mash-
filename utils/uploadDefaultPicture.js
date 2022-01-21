@@ -31,6 +31,7 @@ const uploadCoverPicture = async (userID) => {
     }
 }
 
+//it will upload any base 64 file  in the server 
 const uploadImage = async (base64, name) => {
     const myBase64Data = base64
     const dataExtension = "png"
