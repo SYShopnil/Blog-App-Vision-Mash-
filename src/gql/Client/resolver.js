@@ -1,9 +1,13 @@
 const { createNewClientController
-    ,deleteClientBySlugController} = require('./controller')
+    ,deleteClientBySlugController,
+    updateClientBySLug:updateClientBySLugController,
+    canSeeOnlyHisBlogController} = require('./controller')
 
 const resolver = {
     createClient : createNewClientController,
-    deleteClient: deleteClientBySlugController
+    deleteClient: deleteClientBySlugController,
+    updateClient: updateClientBySLugController,
+    seeOwnBlog: canSeeOnlyHisBlogController
 }
 
 module.exports = resolver

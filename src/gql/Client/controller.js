@@ -5,13 +5,18 @@ const IsUniqueId = require('../../../utils/checkIdUnique')
 const {acceptedProfilePictureExtensions:acceptedExtensionsPic} = require('../../../assert/doc/global')
 const Client = require('../../model/client')
 const User = require('../../model/user')
+const Blog = require('../../model/blog')
 const {profilePicUploader,
     coverPictureUploader} = require('../../../utils/controller/Client/profileAndCoverPicUplaod')
 const bcrypt = require('bcrypt')
 const slugGenerator = require('../../../utils/slugGenerator')
 const newUser = require('../../../utils/controller/createUser')
-const authorizationGql = require('../../../utils/autorization')
-
+const authorizationGql = require('../../../utils/autorization');
+const res = require('express/lib/response');
+const {
+    sortingHandler,
+    blogQueryStructure
+} = require('../../../utils/controller/Client/seeOwnBlogFilterAndSorting')
 //create a new client
 const createNewClientController = async ({input}, req) => {
     try {
@@ -221,8 +226,207 @@ const deleteClientBySlugController = async ({slug}, req) => {
     }
 }
 
+//update client by slug 
+const updateClientBySLug = async ({slug:queySlug, data:updateData}, req) => {
+    try {
+        if (queySlug) {
+            const {isAuth} = req //check is it a authenticate route or not 
+            if (isAuth) {
+                const {user: loggedInUser} = req //get the loggedInUser 
+                const  {isAuthorized} = await authorizationGql (loggedInUser, "admin", "client"); //check the route restriction 
+                if (isAuthorized) { //if route is not denied to access then it will execute
+                    const {
+                        firstName,
+                        lastName,
+                        contactNumber,
+                        district,
+                        division,
+                        country,
+                        socialMedia,
+                        bio
+                    } = updateData
+                    const findClient = await Client.findOne(
+                        {
+                            "slug": queySlug,
+                            "isDelete": false, 
+                            "isActive": true
+                        }
+                    ).select (
+                        `   personalInfo.firstName   
+                            personalInfo.lastName   
+                            personalInfo.contactNumber   
+                            personalInfo.contactNumber   
+                            personalInfo.address   
+                            personalInfo.bio   
+                            othersInfo.socialMedia
+                        `
+                    ) //if client found then it will give a object to us  
+
+                    const  {
+                        personalInfo: {
+                            firstName:existFirstName,
+                            lastName: existLastName,
+                            contactNumber: existContactNumber,
+                            bio: existBio,
+                            address: {
+                                district: existDistrict,
+                                division: existDivision,
+                                country: existCountry
+                            }
+                        },
+                        othersInfo: {
+                            socialMedia: existSocialMedia
+                        }
+                    } = findClient //find the exist database data
+
+                    const updateCLients = await Client.updateOne ( //update data base on data
+                        {
+                            "slug": queySlug,
+                            "isDelete": false, 
+                            "isActive": true
+                        }, //query
+                        {
+                            $set : {
+                                "personalInfo.firstName": firstName || existFirstName,                         
+                                "personalInfo.lastName": lastName || existLastName,                         
+                                "personalInfo.contactNumber": contactNumber || existContactNumber,                         
+                                "personalInfo.address.district": district || existDistrict,                         
+                                "personalInfo.address.division": division || existDivision,                         
+                                "personalInfo.bio": bio || existBio,                         
+                                "personalInfo.address.country": country || existCountry,                        
+                                "othersInfo.socialMedia.country": socialMedia || existSocialMedia                         
+                            }
+                        }, //update 
+                        {
+                            multi: true
+                        } //option
+                    )
+                    if (updateCLients.modifiedCount != 0 ) { //if update successfully then it will happen 
+                        return {
+                            message: "Client updated successfully",
+                            status: 202
+                        }
+                    }else {
+                        return {
+                            message: "Client update failed",
+                            status: 304
+                        }
+                    }
+                }else {
+                    return {
+                        message:  "Permission denied",
+                        status: 401
+                    }
+                }
+            }else {
+                return {
+                    message: "Unauthorized user",
+                    status: 401
+                }
+            }
+        }else {
+            return {
+                message: "Slug required",
+                status: 404
+            }
+        }
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}
+
+
+//client can see only his draft or published blog  
+const canSeeOnlyHisBlogController = async ({input},req) => {
+    try {
+        const {isAuth} = req  //get the is auth status from api auth middleware
+        if (isAuth) { //if this is  a auth user then it will happen 
+            const {user: loggedInUser} = req
+            const {isAuthorized} = await  authorizationGql (loggedInUser, "client") //get the authorization status 
+            if (isAuthorized) { //if user is not authorized then it will happen
+                const {
+                    sortBy,
+                    pageNo,
+                    limit,
+                    searchFor
+                } = input
+                const page = pageNo || 1 
+                const dataLimit = limit || 5 
+                let totalPage
+                //filter of sorting by latest, a-z , z-a, viewers
+                let sortStructure = {} // here sort data structure will be store
+                if (sortBy) {
+                    sortStructure = sortingHandler (sortBy)
+                }
+
+                const query = blogQueryStructure (searchFor) //it will create the structure of query 
+                const findBlog = await Blog.find (
+                    {
+                        ...query
+                    }
+                )
+                if (findBlog) {
+                    const totalData = findBlog.length //get all found data 
+                    const skipData = (page * dataLimit) - dataLimit
+                    totalPage = Math.ceil (totalData / dataLimit) //get how many page we need  
+                    const findFinalData = await Blog.find (
+                        {
+                            ...query
+                        }
+                    )
+                    .sort (sortStructure)
+                    .limit (dataLimit)
+                    .skip (skipData)
+
+                    if (findFinalData) { //if blog found then it will happen
+                        return {
+                            message : `${findFinalData.length} blog found`,
+                            status : 202,
+                            blogs:  findFinalData,
+                            totalPage: totalPage
+                        }
+                    }else {
+                        return {
+                            message: "Blog not found",
+                            status: 404
+                        }
+                    }
+                }else {
+                    return {
+                        message: "Blog not found",
+                        status: 404
+                    }
+                }
+
+            }else {
+                return {
+                    message:  "Permission denied",
+                    status: 401
+                }
+            }
+        }else {
+            return {
+                message: "Unauthorized user",
+                status: 401
+            }
+        }
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}
+
 module.exports = {
     createNewClientController,
-    deleteClientBySlugController
+    deleteClientBySlugController,
+    updateClientBySLug,
+    canSeeOnlyHisBlogController
 }
 

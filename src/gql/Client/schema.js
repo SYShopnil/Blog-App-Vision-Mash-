@@ -40,6 +40,7 @@ const BlogSchema = `
         owner: Client
         contentDetails: ContentDetails
         viewerDetails:  ViewerDetails
+        publishedTime: String
     }
 `
 
@@ -53,6 +54,7 @@ const clientSchema = `
         profilePicture : String 
         coverPicture: String 
         gender: String 
+        bio: String
     }
     type BlogInfo {
         totalBlog: Int 
@@ -96,7 +98,8 @@ const inputField = `
     input createClientInput {
         firstName: String!
         lastName: String! 
-        email: String! 
+        email: String!
+        bio: String
         contactNumber: String! 
         gender: String! 
         district: String! 
@@ -108,28 +111,61 @@ const inputField = `
         password: String! 
         retypePassword: String!
     }
+    input socialMedia {
+        name: String
+        link: String
+    }
+    input UpdateData {
+        firstName: String
+        lastName: String
+        contactNumber: String
+        district: String
+        division: String
+        country: String
+        socialMedia: [socialMedia]
+        bio: String
+    }
+    input ownBlog {
+        sortBy: String,
+        pageNo: Int,
+        limit: Int,
+        searchFor: String
+    }
 `
 const mainSchema = buildSchema (`
     ${clientSchema}
     ${inputField}
-    type ResponseOfCreateAdmin {
+    type ResponseOfCreateClient {
         message: String
         data: Client
         status: Int
     }
-    type ResponseOfDeleteAdmin {
+    type ResponseOfDeleteClient {
         message: String
         status: Int
     }
+    type ResponseOfUpdateClient{
+        message: String
+        status: Int
+    }
+    type ResponseOfSeeOwnBLog {
+        message: String
+        status: Int
+        blogs: [Blog]
+        totalPage: Int
+    }
     type Query {
-        createClient : ResponseOfCreateAdmin
+        createClient : ResponseOfCreateClient
     }
     type Mutation {
-        createClient (input: createClientInput) : ResponseOfCreateAdmin
-        deleteClient (slug: String!) : ResponseOfDeleteAdmin
+        createClient (input: createClientInput) : ResponseOfCreateClient
+        deleteClient (slug: String!) : ResponseOfDeleteClient
+        updateClient (slug: String, data: UpdateData): ResponseOfUpdateClient
+        seeOwnBlog (input: ownBlog): ResponseOfSeeOwnBLog
     }
 `)
 
 module.exports = mainSchema
+
 
 

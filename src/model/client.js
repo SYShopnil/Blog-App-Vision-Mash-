@@ -20,6 +20,10 @@ const clientSchema = new Schema ({
             district: String,
             division: String,
             country: String
+        },
+        bio: {
+            type: String,
+            default: ""
         }
     },
     password: String,

@@ -18,7 +18,7 @@ const mainValidation = Joi.object ({
     district: Joi.string().required(),
     division: Joi.string().required() ,
     country: Joi.string().required() ,
-    socialMedia: Joi.array().items (SocialMediaValidation),
+    socialMedia: Joi.array().items (SocialMediaValidation)
 })
 
 module.exports = mainValidation
