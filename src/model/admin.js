@@ -6,12 +6,17 @@ const adminSchema = new Schema ({
     personalInfo : {
         firstName: String,
         lastName: String,
-        email: String
+        email: String,
+        contactNumber: String
     },
     userType: {
         type: String,
         enum : ["admin"],
         default: "admin"
+    },
+    otp: {
+        type: String,
+        default: ""
     },
     userId: String,
     password: String,

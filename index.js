@@ -4,11 +4,16 @@ const mongoose = require('mongoose');
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
 const gqlHeader = require('express-graphql-header')
-const adminGql = require('./src/gql/Admin/graphql')
-const clientGql = require('./src/gql/Client/graphql')
-const authGql = require('./middleware/gql/authentication')
+
+//rest
 const clientRest = require('./src/rest/Client/route')
 const userRest = require('./src/rest/User/route')
+
+//gql 
+const adminGql = require('./src/gql/Admin/graphql')
+const clientGql = require('./src/gql/Client/graphql')
+const userGql = require('./src/gql/User/graphql')
+const authGql = require('./middleware/gql/authentication')
 
 //env file
 const url = process.env.SERVER_URL || 8080
@@ -46,9 +51,12 @@ app.use(authGql)
 
 app.use ("/admin", gqlHeader, adminGql)
 app.use("/client", gqlHeader, clientGql)
+app.use("/user", gqlHeader, userGql)
 
 //page not found route
 app.get ("*", (req, res) => {
     res.send (`404 Page not found`)
 })
+
+
 

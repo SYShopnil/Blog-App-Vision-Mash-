@@ -10,7 +10,7 @@ const createUser = require ("../../../utils/controller/createUser")
 //create a new admin
 const createNewAdmin = async ({input}, req) => {
     try {
-        const {firstName, lastName, email, password} = input //get all input data 
+        const {firstName, lastName, email, password, contactNumber} = input //get all input data 
         const {error} = createAdminValidation.validate (input)
         if (error) { //if there have some error then it will show status code 406 with joi validation error message
             return {
@@ -33,7 +33,8 @@ const createNewAdmin = async ({input}, req) => {
                         personalInfo : {
                             firstName,
                             lastName,
-                            email
+                            email,
+                            contactNumber
                         },
                         password: hashedPassword,
                         userId

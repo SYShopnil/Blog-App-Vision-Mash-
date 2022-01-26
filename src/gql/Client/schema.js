@@ -126,9 +126,9 @@ const inputField = `
         bio: String
     }
     input ownBlog {
-        sortBy: String,
-        pageNo: Int,
-        limit: Int,
+        sortBy: String
+        pageNo: Int
+        limit: Int
         searchFor: String
     }
 `

@@ -24,7 +24,7 @@ const authenticationMiddleware = async (req, res, next) => {
                 }) // find the user
                 if (user) { //if it is a valid user then it will execute
                     if (userType == "admin") {
-                        const user = await Admin.findOne({slug, userId}).select ("-password") //find logged in user 
+                        const user = await Admin.findOne({slug, userId}).select ("-password -otp") //find logged in user 
                         if (user) { //if admin found then it will execute
                             req.user = user
                             next()
@@ -34,7 +34,7 @@ const authenticationMiddleware = async (req, res, next) => {
                             })
                         }
                     }else if (userType == "client") { //if user is client then it will execute
-                        const user = await Client.findOne({slug, "clientId": userId}).select ("-password") //find logged in user 
+                        const user = await Client.findOne({slug, "clientId": userId}).select ("-password -otp") //find logged in user 
                         if (user) { //if client found then it will execute
                             req.user = user
                             next()

@@ -50,8 +50,9 @@ const monthName = [
         no: 12
     },
 ]
-
+const verificationsOtpDigit = 4
 module.exports = {
     acceptedProfilePictureExtensions,
-    monthName
+    monthName,
+    verificationsOtpDigit
 }

@@ -5,6 +5,7 @@ const Admin = `
         firstName: String
         lastName: String
         email: String
+        contactNumber: String
     }
     type Admin {
         _id: ID
@@ -22,6 +23,7 @@ const inputField = `
         email: String!
         password: String!
         retypePassword: String!
+        contactNumber: String!
     }
 `
 const mainSchema = buildSchema (`

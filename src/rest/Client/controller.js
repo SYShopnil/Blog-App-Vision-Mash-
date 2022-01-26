@@ -32,10 +32,10 @@ const seeOnlyHisActivityByYear = async (req, res) => {
             }
         ).select ("publishedTime")
         if (findAllBlog.length != 0) { //if blog has found then it will execute
-            const countOfBlog = activityTracker (findAllBlog) //get the count of blog
+            const {totalBlog, tracking:countOfBlog} = activityTracker (findAllBlog) //get the count of blog
             if (countOfBlog.length != 0) {
                 res.status(202).json ({
-                    message: `${countOfBlog.length} blogs has been found`, 
+                    message: `${totalBlog} blogs has been found`, 
                     data: countOfBlog
                 })
             }else {
