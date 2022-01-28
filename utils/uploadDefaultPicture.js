@@ -19,6 +19,17 @@ const uploadProfilePicture = async (sex, userID) => {
         }
     }
 }
+const uploadBlogTittleImage = async (blogId) => {
+    let base64
+    base64 = fs.readFileSync (`${__dirname}/../assert/defaultMaleProfile.png`, "base64") //it will convert local default image to base64 format
+    if (base64) {
+        const {fileAddStatus, fileUrl} = await  uploadImage(base64, blogId) //this will upload local server image into server
+        return {
+            fileAddStatus,
+            fileUrl
+        }
+    }
+}
 
 const uploadCoverPicture = async (userID) => {
     let base64 = fs.readFileSync (`${__dirname}/../assert/defaultCoverPic.jpg`, "base64") //it will convert local default image to base64 format
@@ -64,5 +75,6 @@ const uploadImage = async (base64, name) => {
 
 module.exports = {
     uploadProfilePicture,
-    uploadCoverPicture
+    uploadCoverPicture,
+    uploadBlogTittleImage
 }

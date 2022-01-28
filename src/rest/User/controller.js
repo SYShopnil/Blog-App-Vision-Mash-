@@ -11,6 +11,11 @@ const {verificationsOtpDigit:otpDigit} = require("../../../assert/doc/global")
 const sendOtp = require("../../../utils/sendMessageToNumber")
 const sendMailer = require("../../../utils/sentMail")
 const jwt = require ("jsonwebtoken")
+const jwtSecurityCode = process.env.JWT_CODE
+const OTPVerification = require("../../../utils/otpVerification")
+const jwtVerifier = require("../../../utils/jwtVerify")
+const req = require('express/lib/request')
+const cookieOption = require ("../../../utils/cookieOption")
 
 //login controller 
 const loginController = async (req, res) => {
@@ -318,7 +323,7 @@ const forgotPasswordPartOneController = async (req, res) => {
                     tokenData.slug = slug
                     tokenData.userId = userId
                     number = contactNumber
-                    console.log(findAdmin.personalInfo.contactNumber);
+                    // console.log(findAdmin.personalInfo.contactNumber);
                     const updateOtp = await Admin.updateOne (
                         {
                             slug,
@@ -380,7 +385,7 @@ const forgotPasswordPartOneController = async (req, res) => {
                     })
                 }
             }
-            const {token:newToken, isCreate:isTokenCreate } = await tokenGenerator (tokenData, "0.5h")
+            const {token:newToken, isCreate:isTokenCreate } = await tokenGenerator (tokenData, process.env.PASSWORD_RESET_TOKEN_TIME)
             if (newOTP) {
                 if (isTokenCreate) {
                     const token = newToken //create new token it contains userType, email, slug and userId
@@ -404,19 +409,14 @@ const forgotPasswordPartOneController = async (req, res) => {
                             responseMessage = `A ${otpDigit} digit otp has been sent to ${sendNumber}`
                         }else {
                             res.json ({
-                                message: "Otp message not send"
+                                message: "OTP message not send"
                             })
                         }
                     }
                     if (responseMessage) {
                         // cookie options
-                        const options = {
-                            expires: new Date(
-                                Date.now() + 0.083 * 24 * 60 * 60 * 1000
-                            ),
-                            httpOnly: true,
-                        };
-                        res.cookie ("verifyToken", token, options).status (202).json ({
+                        const options = cookieOption (process.env.PASSWORD_RESET_COOKIE_TIME || 1)
+                        res.cookie (process.env.FORGOT_PASSWORD_USER_COOKIE_NAME, token, options).status (202).json ({
                             message: responseMessage
                         })
                     }else {
@@ -445,12 +445,126 @@ const forgotPasswordPartOneController = async (req, res) => {
     }
 }
 
-//
+//forgot password part 2 take the otp and verify it 
+const verifyTheForgotPasswordOTPController = async (req, res) => {
+    try {
+        const {otp:inputOTP} = req.body //get the input otp
+        if (inputOTP.length == 4) { //if otp found then it will happen
+            const {verifyToken} = req.cookies
+            const {email, slug, userType} = await jwt.verify (verifyToken, jwtSecurityCode)
+            const {isMatch} = await  OTPVerification (email, slug, userType, inputOTP)
+            if (isMatch) { //if otp match with database otp then it will happen
+                res.status(202).json ({
+                    message: "OTP successful verified",
+                    isVerified: true
+                })
+            }else {
+                res.json ({
+                    message: "OTP not verified please put a valid one",
+                    isVerified: false
+                })
+            }
+            
+        }else {
+            res.json ({
+                message: "OTP required or not valid"
+            })
+        }
+    }catch (err) {
+        res.json ({
+            message: err.message
+        })
+    }
+}
+
+//forgot password part 3 after verify the otp it will take the new password and update it.
+const resetPasswordController = async (req, res) => {
+    try {
+        const {error} = passwordValidation.validate (req.body) //password validation part 
+        if (error) {
+            res.json ({
+                message: error.message
+            })
+        }
+        const {newPassword} = req.body //get the data from body
+        const {verifyToken} = req.cookies //get the token from cookies
+        const {isVerify:{email, slug, userId,userType}} = await jwtVerifier (verifyToken)
+        const hashedPassword = await bcrypt.hash (newPassword, 10)
+        if (hashedPassword) { //if password is hashed then it will happen
+            let isPasswordChange = false //it will track that is password have changed or not
+            if (userType == "admin") { //if user type is admin
+                const updateAdmin = await Admin.updateOne ( //update the admin data and update the password
+                    {
+                        userType,
+                        "personalInfo.email": email,
+                        slug,
+                        userId
+                    },
+                    {
+                        $set: {
+                            password: hashedPassword
+                        }
+                    },
+                    {
+                        multi: true
+                    }
+                )
+                if (updateAdmin.modifiedCount != 0 ) { //if admin is modified then it will happen
+                    isPasswordChange = true
+                }else {
+                    isPasswordChange = false
+                }
+            }else if (userType == "client") { //if user type is client
+                const updateClient = await Client.updateOne ( //update the client data and update the password
+                    {
+                        userType,
+                        "personalInfo.email": email,
+                        slug,
+                        clientId
+                    },
+                    {
+                        $set: {
+                            password: hashedPassword
+                        }
+                    },
+                    {
+                        multi: true
+                    }
+                )
+                if (updateClient.modifiedCount != 0 ) { //if client is modified then it will happen
+                    isPasswordChange = true
+                }else {
+                    isPasswordChange = false
+                }
+            }
+            if (isPasswordChange) { //if the password is change then it will sent a positive response
+                res.clearCookie (process.env.FORGOT_PASSWORD_USER_COOKIE_NAME).status(202).json ({
+                    message: "Password has changed successfully"
+                })
+            }else {
+                res.json ({
+                    message: "Password change failed"
+                })
+            }
+        }else {
+            res.json ({
+                message: "Password hashing problem"
+            })
+        }
+    }catch (err) {
+        console.log(err);
+        res.json ({
+            message: err.message
+        })
+    }
+}   
 
 module.exports = {
     loginController,
     seeHisProfileController,
     confirmLoggedInUserPasswordController,
     updateLoggedInUserPassword,
-    forgotPasswordPartOneController
+    forgotPasswordPartOneController,
+    verifyTheForgotPasswordOTPController,
+    resetPasswordController
 }
