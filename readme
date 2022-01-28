@@ -10,3 +10,7 @@ TWILIO_ADMIN_NUMBER = this number will be provide in the twilio  account for tes
 HOST_EMAIL = this will be the host email [host email should be less security apply]
 HOST_PASSWORD = this will be the host email password
 SENDER_EMAIL =  this will be the sender email. From this email email will be sent
+PASSWORD_RESET_TOKEN_TIME = example: "0.5h"
+PASSWORD_RESET_COOKIE_TIME = example: 0.021 // it means day line 1 means 1 day
+FORGOT_PASSWORD_USER_COOKIE_NAME = forgot password time this cookie will be save in the cookie storage
+BLOG_SINGLE_PAGE_URL = this will be the single blog page url without slug name example : "http://localhost:3000/blog/"
