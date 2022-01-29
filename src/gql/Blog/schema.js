@@ -3,7 +3,7 @@ const {buildSchema} = require('graphql')
 const inputField = `
     input inputImage {
         base64: String
-        size: String
+        size: Int
     }
     input InputSaveNewBlog {
         title: String
@@ -96,6 +96,16 @@ const clientSchema = `
 `
 
 const ResponseSchema = `
+    type createBlogResponse {
+        message: String!
+        blog: Blog
+        status: Int!
+    }
+    type publishBlogResponse {
+        message: String!
+        blog: Blog
+        status: Int!
+    }
 `
 const CommonSchema = `
     ${clientSchema}
@@ -111,9 +121,11 @@ const mainSchema = buildSchema (
             blog: String
         }
         type Mutation {
-            saveBlog (input: InputSaveNewBlog, blogId: String ) :  Blog
+            saveBlog (input: InputSaveNewBlog, blogId: String ) :  createBlogResponse
+            publishBlog (input: InputSaveNewBlog, blogId: String): publishBlogResponse
         }
     `
 )
 
 module.exports = mainSchema
+

@@ -1,10 +1,12 @@
 const {
-    saveNewOrExistBlogController
+    saveNewOrExistBlogController,
+    publishedBlogController
 } = require ("./controller")
 
 //resolver
 const resolver = {
-    saveBlog: saveNewOrExistBlogController
+    saveBlog: saveNewOrExistBlogController,
+    publishBlog: publishedBlogController
 }
 
 module.exports = resolver

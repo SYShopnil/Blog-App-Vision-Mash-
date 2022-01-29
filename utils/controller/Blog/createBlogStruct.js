@@ -48,15 +48,16 @@ const blogCreator = (
             ...struct,
             "contentDetails.content.draft": content,
             "contentDetails.content.published": content,
-            "isPublished": true
+            "isPublished": true,
+            "publishedTime":  Date.now ()
         }
     }
-    if (content) { //if content exist
-        struct = {
-            ...struct,
-            "contentDetails.content": content
-        }
-    }
+    // if (content) { //if content exist
+    //     struct = {
+    //         ...struct,
+    //         "contentDetails.content": content
+    //     }
+    // }
     if (blogId) { //if blogId exist
         struct = {
             ...struct,
