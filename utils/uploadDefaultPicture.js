@@ -21,7 +21,7 @@ const uploadProfilePicture = async (sex, userID) => {
 }
 const uploadBlogTittleImage = async (blogId) => {
     let base64
-    base64 = fs.readFileSync (`${__dirname}/../assert/defaultMaleProfile.png`, "base64") //it will convert local default image to base64 format
+    base64 = fs.readFileSync (`${__dirname}/../assert/blogDefaultTitlePic.png`, "base64") //it will convert local default image to base64 format
     if (base64) {
         const {fileAddStatus, fileUrl} = await  uploadImage(base64, blogId) //this will upload local server image into server
         return {
@@ -31,8 +31,13 @@ const uploadBlogTittleImage = async (blogId) => {
     }
 }
 
-const uploadCoverPicture = async (userID) => {
-    let base64 = fs.readFileSync (`${__dirname}/../assert/defaultCoverPic.jpg`, "base64") //it will convert local default image to base64 format
+const uploadCoverPicture = async (userID, type = "user") => {
+    let base64
+    if (type == "blog") {
+        base64 = fs.readFileSync (`${__dirname}/../assert/blogDefaultCoverPic.jpg`, "base64") //it will convert local default image to base64 format
+    }else if (type == "user") {
+        base64 = fs.readFileSync (`${__dirname}/../assert/defaultCoverPic.jpg`, "base64") //it will convert local default image to base64 format
+    } 
     if (base64) {
         const {fileAddStatus, fileUrl} = await  uploadImage(base64, userID) //this will upload local server image into server
         return {

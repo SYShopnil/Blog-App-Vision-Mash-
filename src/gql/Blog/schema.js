@@ -14,6 +14,11 @@ const inputField = `
         titlePic: inputImage
         content: String
     }
+    input InputBlogUpdate {
+        subCategory: [String]
+        mainCategory: String
+        keyWord: [String]
+    }
 `
 const BlogSchema = `
     type ViewDetails {
@@ -106,6 +111,23 @@ const ResponseSchema = `
         blog: Blog
         status: Int!
     }
+    type previewBlogResponse {
+        message: String!
+        blog: Blog
+        status: Int!
+    }
+    type deleteBlogResponse {
+        message: String!
+        status: Int!
+    }
+    type updateBlogResponse {
+        message: String!
+        status: Int!
+    }
+    type updateBlogImage {
+        message: String!
+        status: Int!
+    }
 `
 const CommonSchema = `
     ${clientSchema}
@@ -123,6 +145,10 @@ const mainSchema = buildSchema (
         type Mutation {
             saveBlog (input: InputSaveNewBlog, blogId: String ) :  createBlogResponse
             publishBlog (input: InputSaveNewBlog, blogId: String): publishBlogResponse
+            previewBlog(blogId: String!) : previewBlogResponse
+            deleteBlog (slug: String!) : deleteBlogResponse
+            updateBlog (input: InputBlogUpdate slug: String!) : updateBlogResponse
+            updateBlogImage (input: inputImage  slug:String! type:String!): updateBlogImage
         }
     `
 )

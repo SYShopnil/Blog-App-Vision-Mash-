@@ -71,7 +71,7 @@ const createNewBlogHandler = async ({
         const {
             fileAddStatus,
             fileUrl
-        } = await uploadCoverPicture (blogId)
+        } = await uploadCoverPicture (blogId, "blog")
         if (fileAddStatus) {
             coverPicUrl = fileUrl
             // console.log({fileUrl});

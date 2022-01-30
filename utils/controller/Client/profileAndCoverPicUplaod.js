@@ -48,7 +48,7 @@ const coverPictureUploader  = async (file,clientId) => {
         coverImageUrl = fileUrl
         isExtensionValidateCoverPic = extensionValidation
     }else {
-        const {fileAddStatus, fileUrl } = await  uploadCoverPicture (clientId)
+        const {fileAddStatus, fileUrl } = await  uploadCoverPicture (clientId, "user")
         if ( fileAddStatus) { //upload the default cover image
             coverImageUrl = fileUrl
             isCoverImageUpload = fileAddStatus
