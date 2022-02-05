@@ -4,7 +4,9 @@ const {
     previewBlogByBlogIdController,
     deleteBlogBySlugController,
     updateBlogBySlugController,
-    updateBlogTitlePictureOrCover
+    updateBlogTitlePictureOrCover,
+    getBlogsController
+
 } = require ("./controller")
 
 //resolver
@@ -13,7 +15,9 @@ const resolver = {
     publishBlog: publishedBlogController,
     previewBlog: previewBlogByBlogIdController,
     deleteBlog: deleteBlogBySlugController,
-    updateBlogImage: updateBlogTitlePictureOrCover
+    updateBlogImage: updateBlogTitlePictureOrCover,
+    updateBlog: updateBlogBySlugController,
+    blogs: getBlogsController
 }
 
 module.exports = resolver

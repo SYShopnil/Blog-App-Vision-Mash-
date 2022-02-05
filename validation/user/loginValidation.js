@@ -1,7 +1,7 @@
 const Joi = require ('joi')
 
 const mainValidation = Joi.object ({
-    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+    email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'bd'] } }),
     password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{6,30}$')),
 })
 

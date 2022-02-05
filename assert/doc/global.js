@@ -51,8 +51,50 @@ const monthName = [
     },
 ]
 const verificationsOtpDigit = 4
+
+//blog query option
+const blogQueryInput = {
+    recent: "recent",
+    topMonth: "topMonth",
+    popular: "mostRead",
+    featured: "featured",
+    category: "mainCategory",
+    topView: "mostRead"
+}
+
+//regex of blog search 
+const blogSearchRegex = (input) => {
+    const str = `${input}`
+    const regex = new RegExp (str, 'gi')
+    return regex;
+}
+
+//blog sorting option 
+const blogSortingOption = {
+    latest : "latest",
+    A_Z: "A_Z", //sort 	By title name in Ascending order
+    Z_A: "Z_A", //sort 	By title name in Descending order
+    view: "view" //sort by total view in Descending order
+}
+
+//blog pagination options
+const blogPagination = {
+    defaultDataLimit : 5,
+    defaultPageNo: 1
+}
+//sorting ordering 
+const sortOrdering = {
+    desc : -1,
+    asc : 1
+}
 module.exports = {
     acceptedProfilePictureExtensions,
     monthName,
-    verificationsOtpDigit
+    verificationsOtpDigit,
+    blogQueryInput,
+    blogSearchRegex,
+    blogPagination,
+    blogSortingOption,
+    sortOrdering
 }
+

@@ -10,6 +10,13 @@ const {
     acceptedProfilePictureExtensions:acceptExtension
 } = require('../../../assert/doc/global')
 const imageDelete = require('../../../utils/fileDeleteHandler')
+const blogQuery = require('../../../utils/controller/Blog/blogQueryController')
+const sortQuery = require('../../../utils/controller/Blog/blogSortingController')
+const searchController = require('../../../utils/controller/Blog/blogSearchController')
+const {
+    blogPagination
+} = require('../../../assert/doc/global')
+const filterController = require('../../../utils/controller/Blog/blogFilteringController')
 
 //save a new blog or update existing blog and put data into draft section
 const saveNewOrExistBlogController = async ({input, blogId}, req) => {
@@ -611,12 +618,102 @@ const updateBlogTitlePictureOrCover = async ({input, type, slug}, req) => {
     }
 }
 
+//get blog by filtering and many things
+const getBlogsController = async ({
+    queryBy, 
+    queryInput, 
+    sortBy, 
+    search, 
+    filterBy, 
+    dataLimit,
+    pageNo:inputPageNo
+}, req) => {
+    try {
+        const query = { //default query structure
+            $and: [
+                {
+                    isPublished: true,
+                    isActive: true,
+                    isDelete: false
+                }
+            ]
+        }
+        let sort = {} //default sort structure
+        blogQuery (queryBy, query, queryInput); //this will create the blog query structure
+        sortQuery (queryBy, sortBy, sort)  //this will create the sort  structure
+        searchController (search, query) //this will create the search  structure
+        filterController (filterBy, query) //this will create the filter query structure
+        const countAllBlog = await Blog.find (query).sort (sort)
+        const totalData = countAllBlog.length //get all blog count 
+        const limitData = dataLimit ? dataLimit : blogPagination.defaultDataLimit //if data limit has given from body then that will be apply otherwise global default data limit will b apply
+        const pageNo = inputPageNo ? inputPageNo : blogPagination.defaultPageNo //if page number has given from body then that will be apply otherwise global default page number will b apply
+        const skipData = (pageNo * limitData) - limitData //this amount of data will be skip 
+        const totalPage = Math.ceil (totalData / limitData) //total this amount of page we need
+        const findBlog = await Blog.find (query).sort (sort).limit (limitData).skip (skipData).populate (
+            {
+                path: "owner",
+                select: `
+                    personalInfo
+                    clientId
+                    clientId
+                    othersInfo.socialMedia
+                `
+            }
+        ) //this will give all expected data from the database to us.
+
+        if (findBlog.length != 0) { //if blog found then it will happen
+            const foundBlog = JSON.parse (JSON.stringify(findBlog)) //deep copy the found data
+            let subCategory = [];
+            let keyword = [];
+            foundBlog.map (blog => {
+                const {
+                    contentDetails: {
+                        subCategory:sub,
+                        keyword: key
+                    }
+                } = blog //get all keyword from every blogs;
+                subCategory.push (
+                    ...sub
+                )
+                keyword.push (
+                    ...key
+                )
+            })
+            subCategory = [...new Set (subCategory)] //tale only the unique sub category
+            keyword = [...new Set (keyword)] //tale only the unique key word 
+            return {
+                message: `${findBlog.length} ${findBlog.length > 1 ? "blogs" : "blog"} found`,
+                status: 202,
+                subCategory,
+                keyWord: keyword,
+                totalPage,
+                totalBlog: totalData
+            }
+        }else {
+            return {
+                message: "No blog found",
+                status: 404
+            }
+        }
+        
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}
+
 module.exports = {
     saveNewOrExistBlogController,
     publishedBlogController,
     previewBlogByBlogIdController,
     deleteBlogBySlugController,
     updateBlogBySlugController,
-    updateBlogTitlePictureOrCover
+    updateBlogTitlePictureOrCover,
+    getBlogsController
 }
+
+
 

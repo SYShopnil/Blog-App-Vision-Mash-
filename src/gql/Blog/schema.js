@@ -19,6 +19,11 @@ const inputField = `
         mainCategory: String
         keyWord: [String]
     }
+    input filterByInput {
+        publishedYear: String
+        subCategory: [String]
+    }
+
 `
 const BlogSchema = `
     type ViewDetails {
@@ -128,6 +133,14 @@ const ResponseSchema = `
         message: String!
         status: Int!
     }
+    type getBlogsResponse {
+        message: String!
+        status: Int!  
+        subCategory: [String]
+        keyWord: [String]
+        totalPage: Int
+        totalBlog: Int
+    }
 `
 const CommonSchema = `
     ${clientSchema}
@@ -140,7 +153,7 @@ const mainSchema = buildSchema (
     `  
         ${CommonSchema}
         type Query {
-            blog: String
+            blogs (queryBy: String, queryInput: String search: String, filterBy: filterByInput sortBy: String dataLimit: String pageNo: Int): getBlogsResponse
         }
         type Mutation {
             saveBlog (input: InputSaveNewBlog, blogId: String ) :  createBlogResponse
