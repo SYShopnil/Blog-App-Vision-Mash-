@@ -136,6 +136,7 @@ const ResponseSchema = `
     type getBlogsResponse {
         message: String!
         status: Int!  
+        blogs: [Blog]
         subCategory: [String]
         keyWord: [String]
         totalPage: Int
@@ -167,4 +168,5 @@ const mainSchema = buildSchema (
 )
 
 module.exports = mainSchema
+
 

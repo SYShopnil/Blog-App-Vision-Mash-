@@ -685,6 +685,7 @@ const getBlogsController = async ({
                 message: `${findBlog.length} ${findBlog.length > 1 ? "blogs" : "blog"} found`,
                 status: 202,
                 subCategory,
+                blogs: findBlog,
                 keyWord: keyword,
                 totalPage,
                 totalBlog: totalData
