@@ -5,7 +5,10 @@ const {
     deleteBlogBySlugController,
     updateBlogBySlugController,
     updateBlogTitlePictureOrCover,
-    getBlogsController
+    getBlogsController,
+    getTwoTopCurrentMonthBlogController,
+    markFeaturedController,
+    makeViewForBlogController
 
 } = require ("./controller")
 
@@ -17,7 +20,10 @@ const resolver = {
     deleteBlog: deleteBlogBySlugController,
     updateBlogImage: updateBlogTitlePictureOrCover,
     updateBlog: updateBlogBySlugController,
-    blogs: getBlogsController
+    blogs: getBlogsController,
+    getTopMonthBlog: getTwoTopCurrentMonthBlogController,
+    setIsFetcherBlog: markFeaturedController,
+    countViewers: makeViewForBlogController
 }
 
 module.exports = resolver

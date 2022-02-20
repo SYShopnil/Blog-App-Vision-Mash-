@@ -38,6 +38,7 @@ const BlogSchema = `
     type ViewerDetails {
         details: [ViewDetails]
         userTrack: [TrackDetails]
+        totalView: Int!
     }
     type Content {
         published: String 
@@ -63,7 +64,7 @@ const BlogSchema = `
         isActive: Boolean 
         owner: Client
         contentDetails: ContentDetails
-        viewerDetails:  ViewerDetails
+        viewersDetails:  ViewerDetails
         publishedTime: String
     }
 `
@@ -142,6 +143,20 @@ const ResponseSchema = `
         totalPage: Int
         totalBlog: Int
     }
+    type getTopMonthBlogResponse {
+        message: String!
+        category : [String]
+        blog : [Blog]
+        status: Int!
+    }
+    type IsFetcherResponse {
+        message: String!
+        status: Int!
+    }
+    type countViewersResponse {
+        message: String!
+        status: Int!
+    }
 `
 const CommonSchema = `
     ${clientSchema}
@@ -155,6 +170,7 @@ const mainSchema = buildSchema (
         ${CommonSchema}
         type Query {
             blogs (queryBy: String, queryInput: String search: String, filterBy: filterByInput sortBy: String dataLimit: String pageNo: Int): getBlogsResponse
+            getTopMonthBlog : getTopMonthBlogResponse
         }
         type Mutation {
             saveBlog (input: InputSaveNewBlog, blogId: String ) :  createBlogResponse
@@ -163,10 +179,10 @@ const mainSchema = buildSchema (
             deleteBlog (slug: String!) : deleteBlogResponse
             updateBlog (input: InputBlogUpdate slug: String!) : updateBlogResponse
             updateBlogImage (input: inputImage  slug:String! type:String!): updateBlogImage
+            setIsFetcherBlog (slugs : [String]!) : IsFetcherResponse
+            countViewers (slug: String) : countViewersResponse
         }
     `
 )
 
 module.exports = mainSchema
-
-

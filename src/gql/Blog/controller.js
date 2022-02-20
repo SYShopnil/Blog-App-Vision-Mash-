@@ -17,6 +17,15 @@ const {
     blogPagination
 } = require('../../../assert/doc/global')
 const filterController = require('../../../utils/controller/Blog/blogFilteringController')
+const getBlog = require('../../../utils/controller/Blog/getBlog')
+const {
+    keyWord: {
+        CMB,
+        CMBV
+    }
+} = require('../../../assert/doc/global')
+const {getIPAddress} = require('../../../utils/deviceConfig')
+const {getTodayDate} = require('../../../utils/dateHandler')
 
 //save a new blog or update existing blog and put data into draft section
 const saveNewOrExistBlogController = async ({input, blogId}, req) => {
@@ -706,6 +715,276 @@ const getBlogsController = async ({
     }
 }
 
+//get top two blog current month blogs
+const getTwoTopCurrentMonthBlogController = async ({input}, req)  => {
+    try {
+        const currentMonth = new Date ().getMonth();
+        // console.log(currentMonth)
+        const getAllBlog = await getBlog (CMBV); //get all current month published blog;  month will be count from  0 - 11
+        if (getAllBlog.length != 0) {
+            // const sortCategory = getAllBlog.sort ((a,b) => a.viewersDetails. -  b.viewersDetails.totalView)
+            const sortBlogByViewers = getAllBlog.sort ( (first, second) => { //it will sort blogs by this month viewers
+                const firstOrder = first.viewersDetails.details.filter (viewDetails => viewDetails.month == currentMonth)
+                const secondOrder = second.viewersDetails.details.filter (viewDetails => viewDetails.month == currentMonth)
+                return secondOrder[0].view - firstOrder[0].view;
+            })
+            const allCategory = []; //it will store all category of blogs
+            sortBlogByViewers.map (blog => { // it will set the blog  category in all Category array
+                allCategory.push (blog.contentDetails.mainCategory);
+            })
+            const getTopTwoCategory = [...new Set (allCategory)].filter ((category, ind) => ind < 2 ) //get the top two blog category of the month
+            const topTwoCategoryBlog = []; //this will store two top categories of the blog of the month
+            getTopTwoCategory.map (category => {  //this will store the top two categories
+                const blog = sortBlogByViewers.find (blog => blog.contentDetails.mainCategory == category);
+                topTwoCategoryBlog.push (blog);
+            })
+            return {
+                message: "Blog found",
+                status : 202,
+                blog: topTwoCategoryBlog,
+                category : getTopTwoCategory
+            }
+            
+        }else {
+            return {
+                message: "No blog found",
+                status: 404
+            }
+        }
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}   
+
+//mark blog as a featured one 
+const markFeaturedController = async ({slugs}, req) => {
+    try {
+        const {isAuth} = req  //get the is auth status from api auth middleware
+        if (isAuth) { //if this is  a auth user then it will happen 
+            const {user: loggedInUser} = req
+            const {isAuthorized} = await  authorizationGql (loggedInUser, "client") //get the authorization status 
+            if (isAuthorized) { //if user is not authorized then it will happen
+                const operation = slugs.map (s => { //update multiple data in a single query
+                    return {
+                        updateOne : {
+                            filter : {
+                                slug: s,
+                                isPublished: true,
+                                isDelete: false, 
+                                isActive: true
+                            },
+                            update: {
+                                $set : {
+                                    isFeatured: true
+                                }
+                            },
+                            option : {
+                                multi : true
+                            }
+                        }
+                    }
+                })
+                const updateResultOfBLog = await Blog.bulkWrite (operation) //this will update multiple data in a single query
+                if (updateResultOfBLog.result.nModified != 0) { //if update is successfully done then it will happen
+                    return {
+                        message: "Blog has successfully featured",
+                        status: 202
+                    }
+                }else {
+                    return {
+                        message: "Blog featured failed",
+                        status: 304
+                    }
+                }
+            }else {
+                return {
+                    message:  "Permission denied",
+                    status: 401
+                }
+            }
+        }else {
+            return {
+                message: "Unauthorized user",
+                status: 401
+            }
+        }
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}
+
+//count a new view for a blog 
+const makeViewForBlogController = async ({slug},req) => {
+    try {
+        const {ipAddress:currentDeviceIp} = await getIPAddress(); //get the current device Ip address
+        if (currentDeviceIp) { //check that is ip address is exist or not
+            let isLoggedInUser = false;
+            let userData;
+            let isLoggedInUserBLog = false;
+            let isAlreadyViewed = false;
+            const {isAuth} = req
+            if (isAuth) { //if is Auth then there should have a user 
+                isLoggedInUser = true;
+                userData = req.user;
+            }
+            //check that is it logged in user's own blog or not
+            if (isLoggedInUser) { //if user is logged in then it will execute
+                const findBlog = await Blog.findOne ( //query blog by logged in user id and provided slug
+                    {
+                        slug,
+                        owner: userData._id
+                    }
+                )
+                if (findBlog !== {}) { //if query blog is logged in user blog then it will happen 
+                    isLoggedInUserBLog = true
+                }
+            }
+
+            const {
+                start: startTime,
+                end: endTime
+            } = getTodayDate() //get the today start time and end time 
+
+            // check that is it already viewed or not 
+            const checkViewedOrNot = await Blog.findOne (
+                {
+                    $and : [
+                        {
+                            slug
+                        },
+                        {
+                            "viewersDetails.userTrack.ipAddress": currentDeviceIp
+                        },
+                        {
+                            "viewersDetails.userTrack.visitTime": {
+                                $gte: startTime,
+                                $lte: endTime
+                            }
+                        }
+                    ]
+                }
+            )
+            if (!!checkViewedOrNot) { //if is it already viewed then it will execute
+                isAlreadyViewed = true;
+            }
+
+            //if viewer visit own blog then
+            if (!isLoggedInUserBLog) {
+                //check requested ip address already visit it today or not 
+                if (!isAlreadyViewed) { //if user is not already viewed this blog then it will execute
+                    const update = { //update query part
+                        $inc: {
+                            "viewersDetails.totalView": 1
+                        },
+                        $addToSet : {
+                            "viewersDetails.userTrack": {
+                                ipAddress: currentDeviceIp,
+                                visitTime: Date.now()
+                            }
+                        }
+                    }
+                    let query = {
+                        slug,
+                        isDelete: false, 
+                        isActive: true
+                    }
+                    //check that is there have any view of this month or not 
+                    const checkMonthlyView = await Blog.findOne ( //check that is there have already monthly view or not 
+                        {
+                            slug,
+                            isDelete: false, 
+                            isActive: true,
+                            "viewersDetails.details.month": new Date().getMonth(),
+                            "viewersDetails.details.year": new Date().getFullYear(),
+                            "viewersDetails.details.view": {
+                                $gt: 0
+                            }
+                        }
+                    ).select ("viewersDetails.details")
+                    
+                    if (checkMonthlyView) { //if monthly view exist then it will execute
+                        const {viewersDetails: {details}} = checkMonthlyView;
+                        details.map (monthlyDetails => {
+                            if (monthlyDetails.month == new Date().getMonth() && monthlyDetails.year == new Date().getFullYear()) { //if some one already visit this blog in the running month 
+                                query = {
+                                    ...query,
+                                    "viewersDetails.details": {
+                                        $elemMatch:{
+                                            month : monthlyDetails.month,
+                                            year:  monthlyDetails.year
+                                        }
+                                    }
+                                }
+                                update.$set = {
+                                    "viewersDetails.details.$.view":monthlyDetails.view + 1 
+                                }
+                            }
+                        }) 
+                    }else {
+                        update.$addToSet = {
+                            ...update.$addToSet,
+                            "viewersDetails.details": {
+                                view: 1 ,
+                                month : new Date().getMonth() , 
+                                year: new Date().getFullYear()
+                            }
+                        }
+                    }
+                    // console.log(query)
+                    // console.log(update)
+
+                    //original query with update 
+                    const countView = await Blog.updateOne (
+                        query, //query 
+                        update, //update 
+                        {multi: true} //option
+                    )
+                    if (countView.modifiedCount != 0) { //if blog data is updated then it will happen 
+                        return {
+                            message: "View count!!",
+                            status : 202
+                        }
+                    } else {
+                        return {
+                            message: "View count failed",
+                            status : 406
+                        }
+                    }
+                }else {
+                    return {
+                        message: "Viewer count failed due to limit exceeded",
+                        status: 403
+                    }
+                }
+            }else {
+                return {
+                    message: "View count failed due to own blog",
+                    status: 403
+                }
+            }
+
+        }else {
+            return {
+                message: "IP Address required",
+                status: 404
+            }
+        }
+    }catch (err) {
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}
+
 module.exports = {
     saveNewOrExistBlogController,
     publishedBlogController,
@@ -713,8 +992,9 @@ module.exports = {
     deleteBlogBySlugController,
     updateBlogBySlugController,
     updateBlogTitlePictureOrCover,
-    getBlogsController
+    getBlogsController,
+    getTwoTopCurrentMonthBlogController,
+    markFeaturedController,
+    makeViewForBlogController
 }
-
-
 

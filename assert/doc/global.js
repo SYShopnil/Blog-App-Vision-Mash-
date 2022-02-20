@@ -87,6 +87,12 @@ const sortOrdering = {
     desc : -1,
     asc : 1
 }
+
+const keyWord  = {
+    CMB : "currentMonth", //it will show the current month blog 
+    CMBV: "currentMonthByView" //it will query blog by current month by viewer
+}
+
 module.exports = {
     acceptedProfilePictureExtensions,
     monthName,
@@ -95,6 +101,7 @@ module.exports = {
     blogSearchRegex,
     blogPagination,
     blogSortingOption,
-    sortOrdering
+    sortOrdering,
+    keyWord
 }
 
