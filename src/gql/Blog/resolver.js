@@ -8,7 +8,9 @@ const {
     getBlogsController,
     getTwoTopCurrentMonthBlogController,
     markFeaturedController,
-    makeViewForBlogController
+    makeViewForBlogController,
+    getMainCategoryWiseSubCategoryController,
+    getIndividualBLogController
 
 } = require ("./controller")
 
@@ -23,7 +25,9 @@ const resolver = {
     blogs: getBlogsController,
     getTopMonthBlog: getTwoTopCurrentMonthBlogController,
     setIsFetcherBlog: markFeaturedController,
-    countViewers: makeViewForBlogController
+    countViewers: makeViewForBlogController,
+    getSubCategory: getMainCategoryWiseSubCategoryController,
+    getIndividualBlog: getIndividualBLogController
 }
 
 module.exports = resolver

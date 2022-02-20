@@ -877,7 +877,7 @@ const makeViewForBlogController = async ({slug},req) => {
             }
 
             //if viewer visit own blog then
-            if (!isLoggedInUserBLog) {
+            if (!isLoggedInUserBLog) { 
                 //check requested ip address already visit it today or not 
                 if (!isAlreadyViewed) { //if user is not already viewed this blog then it will execute
                     const update = { //update query part
@@ -923,12 +923,13 @@ const makeViewForBlogController = async ({slug},req) => {
                                         }
                                     }
                                 }
-                                update.$set = {
-                                    "viewersDetails.details.$.view":monthlyDetails.view + 1 
+                                update.$inc = {
+                                    "viewersDetails.totalView": 1,
+                                    "viewersDetails.details.$.view": 1 
                                 }
                             }
                         }) 
-                    }else {
+                    }else { //if no one view in this month then it will execute
                         update.$addToSet = {
                             ...update.$addToSet,
                             "viewersDetails.details": {
@@ -985,6 +986,129 @@ const makeViewForBlogController = async ({slug},req) => {
     }
 }
 
+//get all available subCategory of blog if user query by blog main category
+const getMainCategoryWiseSubCategoryController = async ({category},req) => {
+    try {
+        const findBlogByCategory = await Blog.find ( //find all blog by main category
+            {
+                "contentDetails.mainCategory": category,
+                "isActive": true,
+                "isDelete": false,
+                "isPublished": true
+            }
+        )
+        let storeAllSubCategory = [];
+        
+        findBlogByCategory.map (blog => {
+            blog.contentDetails.subCategory.map (sub => {
+                storeAllSubCategory.push (sub)
+            })
+        })
+        storeAllSubCategory = [...new Set ([...storeAllSubCategory])];
+        if (storeAllSubCategory.length != 0 ) { //if subCategory found then it will execute
+            return {
+                message: "Subcategory found!!",
+                status: 202,
+                subCategory: storeAllSubCategory
+            }
+        }else {
+            return {
+                message: "No subcategory found!!",
+                status: 404
+            }
+        }
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}
+
+//get individual blog by blog slug with related blog 
+const getIndividualBLogController = async ({slug}, req) => {
+    try {
+        const getBlogBySlug = await Blog.findOne ( //get blog by slug condition is blog need to published one 
+            {
+                slug,
+                isActive: true,
+                isDelete: false,
+                isPublished: true
+            }
+        )
+        if (getBlogBySlug) { //if blog found then it will happen
+            const {
+                contentDetails: {
+                    subCategory,
+                    keyword,
+                    mainCategory
+                }
+            }= getBlogBySlug //get data from found blog
+            const findRelatedBLog = await Blog.find ( //find all blog by main category, sub category and keyword
+                {
+                    $and: [
+                        {
+                            isActive: true,
+                            isDelete: false,
+                            isPublished: true,
+                            slug: {
+                                $ne: slug
+                            } //this query for skip the main blog from related blog
+                        },
+                        {
+                            $or : [
+                                {
+                                    "contentDetails.subCategory": {
+                                        $in: subCategory
+                                    } //query by subCategory
+                                },
+                                {
+                                    "contentDetails.keyword": {
+                                        $in: keyword
+                                    } //query by keyword
+                                },
+                                {
+                                    "contentDetails.mainCategory": mainCategory //query by main category
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ).sort (
+                {
+                    "contentDetails.title": -1
+                } //sort by title in descending order
+            )
+            if (findRelatedBLog.length != 0) { //if related product found then it will execute
+                return {
+                    message: "Blog found",
+                    status: 202,
+                    blog: getBlogBySlug,
+                    relatedBlog: findRelatedBLog
+                }
+            }else {
+                return {
+                    message: "Blog found",
+                    status: 202,
+                    blog: getBlogBySlug,
+                }
+            }
+        }else {
+            return {
+                message: "Blog not found",
+                status: 404
+            }
+        }
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}
+
 module.exports = {
     saveNewOrExistBlogController,
     publishedBlogController,
@@ -995,6 +1119,8 @@ module.exports = {
     getBlogsController,
     getTwoTopCurrentMonthBlogController,
     markFeaturedController,
-    makeViewForBlogController
+    makeViewForBlogController,
+    getMainCategoryWiseSubCategoryController,
+    getIndividualBLogController
 }
 

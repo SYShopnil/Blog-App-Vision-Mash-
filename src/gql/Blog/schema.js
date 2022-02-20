@@ -157,6 +157,17 @@ const ResponseSchema = `
         message: String!
         status: Int!
     }
+    type getSubCategoryResponse {
+        message: String!
+        status: Int
+        subCategory: [String]
+    }
+    type getIndividualBlogResponse {
+        message: String!
+        status: Int! 
+        blog: Blog
+        relatedBlog: [Blog]
+    }
 `
 const CommonSchema = `
     ${clientSchema}
@@ -171,6 +182,8 @@ const mainSchema = buildSchema (
         type Query {
             blogs (queryBy: String, queryInput: String search: String, filterBy: filterByInput sortBy: String dataLimit: String pageNo: Int): getBlogsResponse
             getTopMonthBlog : getTopMonthBlogResponse
+            getSubCategory (category: String!) : getSubCategoryResponse
+            getIndividualBlog (slug: String!) : getIndividualBlogResponse
         }
         type Mutation {
             saveBlog (input: InputSaveNewBlog, blogId: String ) :  createBlogResponse
