@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 
 const officialSchema = new Schema ({
     logo: String,
+    companyName: String,
     controller : {
         navbarSelectCategory : [String],
         selectSocialMedia: [

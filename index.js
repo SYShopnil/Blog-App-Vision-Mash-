@@ -15,6 +15,7 @@ const clientGql = require('./src/gql/Client/graphql')
 const userGql = require('./src/gql/User/graphql')
 const authGql = require('./middleware/gql/authentication')
 const blogGql = require('./src/gql/Blog/graphql')
+const officialGql = require('./src/gql/Official/graphql')
 
 //env file
 const url = process.env.SERVER_URL || 8080
@@ -54,6 +55,7 @@ app.use ("/admin", gqlHeader, adminGql)
 app.use("/client", gqlHeader, clientGql)
 app.use("/user", gqlHeader, userGql)
 app.use("/blog", gqlHeader, blogGql)
+app.use ("/official", gqlHeader, officialGql)
 
 //page not found route
 app.get ("*", (req, res) => {
