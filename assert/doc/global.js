@@ -93,6 +93,11 @@ const keyWord  = {
     CMBV: "currentMonthByView" //it will query blog by current month by viewer
 }
 
+const officialInfoGetQuery = {
+    giveAllMainCategory : "mainCategory",
+    giveAllSubCategory : "subCategory",
+    giveALlSocialMedia : "socialMedia"
+}
 module.exports = {
     acceptedProfilePictureExtensions,
     monthName,
@@ -102,6 +107,6 @@ module.exports = {
     blogPagination,
     blogSortingOption,
     sortOrdering,
-    keyWord
+    keyWord,
+    officialInfoGetQuery
 }
-

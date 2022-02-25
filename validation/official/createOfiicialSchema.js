@@ -6,7 +6,7 @@ const logoValidation = Joi.object ({
 })
 const availableSocialMediaValidation = Joi.object ({ 
     siteName: Joi.string().required(),
-    link: Joi.string ().required()
+    logo: Joi.string ().required()
 })
 
 const availableMainCategoryValidation = Joi.object ({
