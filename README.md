@@ -1,0 +1,16 @@
+SERVER_URL = any port name
+MONGO_URL = mongodb Url
+DATA_URL = server base domain url 
+COOKIE_EXPIRE = It will show cooked expire date in day. Example 1 day or 15 day
+TOKEN_EXPIRE = It will show jwt expire date in day. Example 1 day or 15 day
+JWT_CODE = Json Web Token security code 
+TWILIO_ACCOUNT_SID = this SID will be provide in the twilio  account
+TWILIO_AUTH_TOKEN = this token will be provide in the twilio  account
+TWILIO_ADMIN_NUMBER = this number will be provide in the twilio  account for testing purposes
+HOST_EMAIL = this will be the host email [host email should be less security apply]
+HOST_PASSWORD = this will be the host email password
+SENDER_EMAIL =  this will be the sender email. From this email email will be sent
+PASSWORD_RESET_TOKEN_TIME = example: "0.5h"
+PASSWORD_RESET_COOKIE_TIME = example: 0.021 // it means day line 1 means 1 day
+FORGOT_PASSWORD_USER_COOKIE_NAME = forgot password time this cookie will be save in the cookie storage
+BLOG_SINGLE_PAGE_URL = this will be the single blog page url without slug name example : "http://localhost:3000/blog/"

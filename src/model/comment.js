@@ -8,8 +8,8 @@ const commentSchema = new Schema ({
         unique: true
     },
     parent: {
-        type: Schema.Types.ObjectId,
-        ref: "Comment"
+        type: String,
+        default: ""
     },
     isDelete: {
         type: Boolean,

@@ -8,6 +8,7 @@ const gqlHeader = require('express-graphql-header')
 //rest
 const clientRest = require('./src/rest/Client/route')
 const userRest = require('./src/rest/User/route')
+const commentRest = require('./src/rest/Comment/route')
 
 //gql 
 const adminGql = require('./src/gql/Admin/graphql')
@@ -16,6 +17,7 @@ const userGql = require('./src/gql/User/graphql')
 const authGql = require('./middleware/gql/authentication')
 const blogGql = require('./src/gql/Blog/graphql')
 const officialGql = require('./src/gql/Official/graphql')
+const commentGql = require('./src/gql/Comment/graphql')
 
 //env file
 const url = process.env.SERVER_URL || 8080
@@ -47,6 +49,7 @@ app.get ("/", (req, res) => {
 //all rest api
 app.use ("/client", clientRest)
 app.use ("/user", userRest)
+app.use ("/comment", commentRest)
 
 //all graphql api
 app.use(authGql)
@@ -56,6 +59,7 @@ app.use("/client", gqlHeader, clientGql)
 app.use("/user", gqlHeader, userGql)
 app.use("/blog", gqlHeader, blogGql)
 app.use ("/official", gqlHeader, officialGql)
+app.use ("/comment", gqlHeader, commentGql)
 
 //page not found route
 app.get ("*", (req, res) => {
