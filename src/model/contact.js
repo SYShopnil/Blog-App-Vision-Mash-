@@ -8,10 +8,20 @@ const contactSchema = new Schema ({
         type: Boolean,
         default: false
     },
-    message: String
+    message: String,
+    contactId: {
+        type: String,
+        unique: true
+    },
+    isDelete: {
+        type: Boolean,
+        default: false
+    }
 },
 {
     timestamps: true
 })
 
 module.exports = mongoose.model ("Contact", contactSchema)
+
+

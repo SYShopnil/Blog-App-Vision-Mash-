@@ -98,6 +98,19 @@ const officialInfoGetQuery = {
     giveAllSubCategory : "subCategory",
     giveALlSocialMedia : "socialMedia"
 }
+
+//contact get query 
+const contactGetAllHandler = {
+    read : "read", //query value
+    unread : "unread", //query value
+    ascByDate : "ascendingByDate", //sorting value
+    descByDate  : "descendingByDate", //sorting value
+    ascByEmail : "ascendingByEmail", //sorting value
+    descByEmail : "descendingByEmail" //sorting value
+}
+
+
+
 module.exports = {
     acceptedProfilePictureExtensions,
     monthName,
@@ -108,5 +121,7 @@ module.exports = {
     blogSortingOption,
     sortOrdering,
     keyWord,
-    officialInfoGetQuery
+    officialInfoGetQuery,
+    contactGetAllHandler
 }
+
