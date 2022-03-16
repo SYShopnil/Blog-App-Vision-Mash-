@@ -9,6 +9,7 @@ const gqlHeader = require('express-graphql-header')
 const clientRest = require('./src/rest/Client/route')
 const userRest = require('./src/rest/User/route')
 const commentRest = require('./src/rest/Comment/route')
+const adminRest = require('./src/rest/Comment/route')
 
 //gql 
 const adminGql = require('./src/gql/Admin/graphql')
@@ -51,7 +52,7 @@ app.get ("/", (req, res) => {
 app.use ("/client", clientRest)
 app.use ("/user", userRest)
 app.use ("/comment", commentRest)
-
+app.use ("/adm", adminRest)
 //all graphql api
 app.use(authGql)
 
@@ -62,6 +63,7 @@ app.use("/blog", gqlHeader, blogGql)
 app.use ("/official", gqlHeader, officialGql)
 app.use ("/comment", gqlHeader, commentGql)
 app.use ("/contact", gqlHeader, contactGql)
+
 
 //page not found route
 app.get ("*", (req, res) => {
