@@ -80,6 +80,10 @@ const inputSchema = `
         base64: String!
         size: Int!
     }
+    input testInput {
+        firstName: String
+        lastName: String
+    }
 `
 
 const responseSchema = `
@@ -109,6 +113,9 @@ const responseSchema = `
         message: String!
         status: Int!
     }
+    type testResponse {
+        message: String!
+    }
 `
 
 const common = `
@@ -122,6 +129,7 @@ const mainSchema = buildSchema (
         ${common}
         type Query {
             getOfficialInfo (queryBy: String) : getOfficialInfoResponse
+            test (input: testInput)  : testResponse
         }
         type Mutation {
             createOfficialData (data: createOfficialInput) : createOfficialSchemaResponse

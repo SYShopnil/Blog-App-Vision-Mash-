@@ -388,8 +388,7 @@ const addNavbarCategoryOrUpdateNavbarCategory = async ({categories}, req) => {
 //get all official info 
 const getAllOfficialInfoController  = async ({queryBy}, req) => {
     try {
-        const {isAuth} = req  //get the is auth status from api auth middleware
-        if (isAuth) { //if this is  a auth user then it will happen 
+        if (true) { 
             // const {user: loggedInUser} = req
             let selectItemStructure = `
                 logo
@@ -499,13 +498,21 @@ const uploadOrUpdateCompanyLogoController = async ({logo}, req) => {
         }
     }
 }
+
+const testing = async({input}, req) => {
+    console.log (input);
+    return {
+        message: "Success"
+    }
+}
 module.exports = {
     createNewOfficialSchemaController,
     addMainCategoryOrSubCategoryController,
     addContactSocialMediaOfOfficial,
     addNavbarCategoryOrUpdateNavbarCategory,
     getAllOfficialInfoController,
-    uploadOrUpdateCompanyLogoController
+    uploadOrUpdateCompanyLogoController,
+    testing
 }
 
 

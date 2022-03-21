@@ -4,7 +4,8 @@ const {
     addContactSocialMediaOfOfficial,
     addNavbarCategoryOrUpdateNavbarCategory,
     getAllOfficialInfoController,
-    uploadOrUpdateCompanyLogoController
+    uploadOrUpdateCompanyLogoController,
+    testing
 } = require('./controller')
 
 const resolver = {
@@ -13,7 +14,8 @@ const resolver = {
     addOrUpdateContactSocialMedia : addContactSocialMediaOfOfficial,
     addNavbarCategory: addNavbarCategoryOrUpdateNavbarCategory,
     getOfficialInfo: getAllOfficialInfoController,
-    uploadLogo: uploadOrUpdateCompanyLogoController
+    uploadLogo: uploadOrUpdateCompanyLogoController,
+    test: testing
 }
 
 module.exports = resolver
