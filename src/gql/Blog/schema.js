@@ -180,10 +180,11 @@ const mainSchema = buildSchema (
     `  
         ${CommonSchema}
         type Query {
-            blogs (queryBy: String, queryInput: String search: String, filterBy: filterByInput sortBy: String dataLimit: String pageNo: Int): getBlogsResponse
+            blogs (queryBy: String, queryInput: String search: String, filterBy: filterByInput, sortBy: String, dataLimit: String, pageNo: Int): getBlogsResponse
             getTopMonthBlog : getTopMonthBlogResponse
             getSubCategory (category: String!) : getSubCategoryResponse
             getIndividualBlog (slug: String!) : getIndividualBlogResponse
+            test (queryBy: String, queryInput: String search: String, filterBy: filterByInput, sortBy: String, dataLimit: String, pageNo: Int): countViewersResponse
         }
         type Mutation {
             saveBlog (input: InputSaveNewBlog, blogId: String ) :  createBlogResponse

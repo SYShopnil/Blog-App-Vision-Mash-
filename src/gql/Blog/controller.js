@@ -35,7 +35,7 @@ const saveNewOrExistBlogController = async ({input, blogId}, req) => {
             const action = "save" //this is a save action api
             const {user:loggedInUser} = req
             const {_id: owner} = loggedInUser
-            const {isAuthorized} = await  authorizationGql (loggedInUser, "client") //get the authorization status 
+            const {isAuthorized} = await  authorizationGql (loggedInUser, "client", "admin") //get the authorization status 
             if (isAuthorized) { //if user is not authorized then it will happen
                 //check that is it update exist blog or create a new blog
                 const {
@@ -163,7 +163,7 @@ const publishedBlogController = async ({input, blogId}, req) => {
         if (isAuth) { //if this is  a auth user then it will happen 
             const {user: loggedInUser} = req
             const {_id: owner} = loggedInUser //get the logged in user unique id as a blog owner
-            const {isAuthorized} = await  authorizationGql (loggedInUser, "client") //get the authorization status 
+            const {isAuthorized} = await  authorizationGql (loggedInUser, "client", "admin") //get the authorization status 
             if (isAuthorized) { //if user is not authorized then it will happen
                 if (!blogId) { //if blog id is available then the blog is already save so we just need to publish it
                     const {error:err} = blogCreateValidation.validate (input)
@@ -303,7 +303,7 @@ const previewBlogByBlogIdController = async ({blogId}, req) => {
         if (isAuth) { //if this is  a auth user then it will happen 
             const {user: loggedInUser} = req
             const {_id: owner} = loggedInUser
-            const {isAuthorized} = await  authorizationGql (loggedInUser, "client") //get the authorization status 
+            const {isAuthorized} = await  authorizationGql (loggedInUser, "client", "admin") //get the authorization status 
             if (isAuthorized) { //if user is not authorized then it will happen
                 const findBlog = await Blog.findOne (
                     {
@@ -1109,6 +1109,95 @@ const getIndividualBLogController = async ({slug}, req) => {
     }
 }
 
+//test controller 
+const testController = async ({
+    queryBy, 
+    queryInput, 
+    sortBy, 
+    search, 
+    filterBy, 
+    dataLimit,
+    pageNo:inputPageNo
+}, req) => {
+    try {
+        console.log(queryBy)
+        // const query = { //default query structure
+        //     $and: [
+        //         {
+        //             isPublished: true,
+        //             isActive: true,
+        //             isDelete: false
+        //         }
+        //     ]
+        // }
+        // let sort = {} //default sort structure
+        // blogQuery (queryBy, query, queryInput); //this will create the blog query structure
+        // sortQuery (queryBy, sortBy, sort)  //this will create the sort  structure
+        // searchController (search, query) //this will create the search  structure
+        // filterController (filterBy, query) //this will create the filter query structure
+        // const countAllBlog = await Blog.find (query).sort (sort)
+        // const totalData = countAllBlog.length //get all blog count 
+        // const limitData = dataLimit ? dataLimit : blogPagination.defaultDataLimit //if data limit has given from body then that will be apply otherwise global default data limit will b apply
+        // const pageNo = inputPageNo ? inputPageNo : blogPagination.defaultPageNo //if page number has given from body then that will be apply otherwise global default page number will b apply
+        // const skipData = (pageNo * limitData) - limitData //this amount of data will be skip 
+        // const totalPage = Math.ceil (totalData / limitData) //total this amount of page we need
+        // const findBlog = await Blog.find (query).sort (sort).limit (limitData).skip (skipData).populate (
+        //     {
+        //         path: "owner",
+        //         select: `
+        //             personalInfo
+        //             clientId
+        //             clientId
+        //             othersInfo.socialMedia
+        //         `
+        //     }
+        // ) //this will give all expected data from the database to us.
+
+        // if (findBlog.length != 0) { //if blog found then it will happen
+        //     const foundBlog = JSON.parse (JSON.stringify(findBlog)) //deep copy the found data
+        //     let subCategory = [];
+        //     let keyword = [];
+        //     foundBlog.map (blog => {
+        //         const {
+        //             contentDetails: {
+        //                 subCategory:sub,
+        //                 keyword: key
+        //             }
+        //         } = blog //get all keyword from every blogs;
+        //         subCategory.push (
+        //             ...sub
+        //         )
+        //         keyword.push (
+        //             ...key
+        //         )
+        //     })
+        //     subCategory = [...new Set (subCategory)] //tale only the unique sub category
+        //     keyword = [...new Set (keyword)] //tale only the unique key word 
+        //     return {
+        //         message: `${findBlog.length} ${findBlog.length > 1 ? "blogs" : "blog"} found`,
+        //         status: 202,
+        //         subCategory,
+        //         blogs: findBlog,
+        //         keyWord: keyword,
+        //         totalPage,
+        //         totalBlog: totalData
+        //     }
+        // }else {
+        //     return {
+        //         message: "No blog found",
+        //         status: 404
+        //     }
+        // }
+        
+    }catch (err) {
+        console.log(err);
+        return {
+            message: err.message,
+            status: 406
+        }
+    }
+}
+
 module.exports = {
     saveNewOrExistBlogController,
     publishedBlogController,
@@ -1121,6 +1210,7 @@ module.exports = {
     markFeaturedController,
     makeViewForBlogController,
     getMainCategoryWiseSubCategoryController,
-    getIndividualBLogController
+    getIndividualBLogController,
+    testController
 }
 

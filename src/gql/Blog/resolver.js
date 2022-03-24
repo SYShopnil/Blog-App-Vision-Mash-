@@ -10,7 +10,8 @@ const {
     markFeaturedController,
     makeViewForBlogController,
     getMainCategoryWiseSubCategoryController,
-    getIndividualBLogController
+    getIndividualBLogController,
+    testController
 
 } = require ("./controller")
 
@@ -27,7 +28,8 @@ const resolver = {
     setIsFetcherBlog: markFeaturedController,
     countViewers: makeViewForBlogController,
     getSubCategory: getMainCategoryWiseSubCategoryController,
-    getIndividualBlog: getIndividualBLogController
+    getIndividualBlog: getIndividualBLogController,
+    test: testController
 }
 
 module.exports = resolver
