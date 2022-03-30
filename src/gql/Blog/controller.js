@@ -738,6 +738,7 @@ const getTwoTopCurrentMonthBlogController = async ({input}, req)  => {
                 const blog = sortBlogByViewers.find (blog => blog.contentDetails.mainCategory == category);
                 topTwoCategoryBlog.push (blog);
             })
+            // console.log (topTwoCategoryBlog)
             return {
                 message: "Blog found",
                 status : 202,

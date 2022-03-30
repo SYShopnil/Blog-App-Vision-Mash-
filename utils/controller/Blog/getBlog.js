@@ -37,11 +37,7 @@ const getBlog = async (type = "all") =>  {
             }
         }
         select = `
-           contentDetails
-           viewersDetails
-           slug
-           blogId
-           url
+            -updatedAt
         `
     }
     const getBlog = await Blog.find (query).select (select) //get all blog by category
@@ -50,3 +46,12 @@ const getBlog = async (type = "all") =>  {
 }
 
 module.exports = getBlog
+
+// select = `
+//            contentDetails
+//            viewersDetails
+//            slug
+//            blogId
+//            url,
+           
+//         `

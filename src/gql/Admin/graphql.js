@@ -5,7 +5,7 @@ const root = require('./resolver')
 const gql = graphqlHTTP ({
     schema,
     rootValue: root,
-    graphiql: true
+    graphiql: true,
 })
 
 module.exports = gql
