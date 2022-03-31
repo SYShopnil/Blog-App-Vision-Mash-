@@ -669,7 +669,20 @@ const getBlogsController = async ({
                 `
             }
         ) //this will give all expected data from the database to us.
-
+    //     if (queryBy == "featured”") {
+    //             console.log({findBlog,queryBy, 
+    // queryInput, 
+    // sortBy, 
+    // search, 
+    // filterBy, 
+    // dataLimit,})
+    //     }
+     console.log({findBlog,queryBy, 
+    queryInput, 
+    sortBy, 
+    search, 
+    filterBy, 
+    dataLimit,})
         if (findBlog.length != 0) { //if blog found then it will happen
             const foundBlog = JSON.parse (JSON.stringify(findBlog)) //deep copy the found data
             let subCategory = [];
